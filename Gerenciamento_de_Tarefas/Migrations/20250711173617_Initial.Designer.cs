@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gerenciamento_de_Tarefas.Migrations
 {
     [DbContext(typeof(GerenciadorTarefasContext))]
-    [Migration("20250617203953_Inicial")]
-    partial class Inicial
+    [Migration("20250711173617_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,12 +34,18 @@ namespace Gerenciamento_de_Tarefas.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoriaId"));
 
                     b.Property<string>("NomeCategoria")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
 
-                    b.Property<int?>("UsuarioId")
+                    b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("CategoriaId");
+
+                    b.HasIndex("NomeCategoria")
+                        .IsUnique();
 
                     b.HasIndex("UsuarioId");
 
@@ -55,6 +61,7 @@ namespace Gerenciamento_de_Tarefas.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TarefaId"));
 
                     b.Property<bool>("Arquivada")
+                        .IsUnicode(false)
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("DataCriacao")
@@ -64,20 +71,30 @@ namespace Gerenciamento_de_Tarefas.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Imagem")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
 
-                    b.Property<int?>("UsuarioId")
+                    b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("TarefaId");
+
+                    b.HasIndex("Titulo")
+                        .IsUnique();
 
                     b.HasIndex("UsuarioId");
 
@@ -145,7 +162,9 @@ namespace Gerenciamento_de_Tarefas.Migrations
                 {
                     b.HasOne("Gerenciamento_de_Tarefas.Models.Usuario", "Usuario")
                         .WithMany("Categorias")
-                        .HasForeignKey("UsuarioId");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Usuario");
                 });
@@ -154,7 +173,9 @@ namespace Gerenciamento_de_Tarefas.Migrations
                 {
                     b.HasOne("Gerenciamento_de_Tarefas.Models.Usuario", "Usuario")
                         .WithMany("Tarefas")
-                        .HasForeignKey("UsuarioId");
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Usuario");
                 });
